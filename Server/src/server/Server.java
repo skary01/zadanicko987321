@@ -14,15 +14,44 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 /**
- * This class implements java Socket server
+ * 
  * @author Ondirko, Karabinos
  *
  */
 
 public class Server 
-{
+{   private final Connection mConnection;
+    
+    Server() throws ClassNotFoundException, SQLException {
+        Class.forName("org.apache.derby.jdbc.ClientDriver");
+        mConnection = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase","test","test");
+        
+  }
+    
+    
+    private void logSimpleQuery(String pCommand) throws SQLException {
+        
+        Statement myStatement = mConnection.createStatement();
+        myStatement.executeUpdate ("INSERT INTO TEST.R_KAMIL ( MENO,PRIEZVISKO,PORADIE,ID ) VALUES ('MICHAL','DOCOLO',1,'4512') ");
+        
+        
+    }
+    
+  public void myQuery(String pCommand) throws SQLException {
+        Statement myStatement = mConnection.createStatement();
+        ResultSet myResultSet = myStatement.executeQuery(pCommand);
+       logSimpleQuery(pCommand);
+       
+    }  
+    
+    
+    
+    
     public static void main(String args[]) throws Exception, SQLException 
-    {
+    {    Server myWrapper = new Server() ;
+    
+    
+    
         int x=0;
         ServerSocket ss = new ServerSocket(3333);
         Socket s = ss.accept();
@@ -30,109 +59,138 @@ public class Server
         DataOutputStream dos = new DataOutputStream(s.getOutputStream());
         InputStreamReader isr = new InputStreamReader(System.in);
         BufferedReader stdin = new BufferedReader(isr);
-        String s1="",s2="",rola="",student="s",referent="r";
+        String s1="",s2="",rola="",student="student",referent="referent";
         while(!s1.equals("stop"))
         {
             s1=dis.readUTF();
-            if((x == 0)&&((s1.equals(student))||(s1.equals(referent))))
+            if(x == 0)
             {
-                rola=s1;
-                x=x+1;
+                try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
+                    PreparedStatement dotaz = connect.prepareStatement("SELECT TYPE_OF_CLIENT FROM CLIENTS WHERE ID=?");)
+                {
+                    dotaz.setString(1, s1);
+                    try(ResultSet result = dotaz.executeQuery())
+                    {
+                        result.next();
+                        rola = result.getString("TYPE_OF_CLIENT");
+                        x=x+1;
+                        
+                
+                    }
+                }catch (SQLException ex) 
+                {
+                    System.out.println("Cannot communicate with database");
+                }
+                
             }  
             System.out.println("Client: "+s1);
             if((x == 1)&&(rola.equals(student)))
             {
-                try (Connection spojenie = DriverManager.getConnection("jdbc:derby://localhost:1527/Server", "test", "test");
-                    PreparedStatement dotaz = spojenie.prepareStatement("SELECT MENO FROM STUDENTI WHERE ID=?");)
+                try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
+                    PreparedStatement dotaz = connect.prepareStatement("SELECT NAME FROM CLIENTS WHERE ID=?");)
                 {
                     dotaz.setString(1, s1);
-                    try(ResultSet vysledky = dotaz.executeQuery())
+                    try(ResultSet result = dotaz.executeQuery())
                     {
-                        vysledky.next();
-                        String meno = vysledky.getString("MENO");
+                        result.next();
+                        String name = result.getString("NAME");
                         x=x+1;
                     }
                 }catch (SQLException ex) 
                 {
-                    System.out.println("Chyba při komunikaci s databází");
+                    System.out.println("Cannot communicate with database");
                 }
             }
             if((x == 2)&&(rola.equals(student)))
             {
-                try (Connection spojenie = DriverManager.getConnection("jdbc:derby://localhost:1527/Server", "test", "test");
-                PreparedStatement dotaz = spojenie.prepareStatement("SELECT MENO,PRIEZVISKO,ID FROM STUDENTI WHERE HESLO=?");)
+                try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
+                PreparedStatement dotaz = connect.prepareStatement("SELECT NAME,SURNAME,ID FROM CLIENTS WHERE PASSWORD=?");)
                 {
                     dotaz.setString(1, s1);
-                    try(ResultSet vysledky = dotaz.executeQuery())
+                    try(ResultSet result = dotaz.executeQuery())
                     {
-                        vysledky.next();
-                        String meno = vysledky.getString("MENO");
-                        String priezvisko = vysledky.getString("PRIEZVISKO");
-                        String id = vysledky.getString("ID");
+                        result.next();
+                        String name = result.getString("NAME");
+                        String surname = result.getString("SURNAME");
+                        String id = result.getString("ID");
                         
 
                         x=x+1;
                     }
                 }catch (SQLException ex) 
                 {
-                    System.out.println("Chyba při komunikaci s databází");
+                    System.out.println("Cannot communicate with database");
                 }
             }
             if((x == 1)&&(rola.equals(referent)))
             {
-                try (Connection spojenie = DriverManager.getConnection("jdbc:derby://localhost:1527/Server", "test", "test");
-                    PreparedStatement dotaz = spojenie.prepareStatement("SELECT MENO FROM REFERENTI WHERE ID=?");)
+                try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
+                    PreparedStatement dotaz = connect.prepareStatement("SELECT NAME FROM CLIENTS WHERE ID=?");)
                 {
                     dotaz.setString(1, s1);
-                    try(ResultSet vysledky = dotaz.executeQuery())
+                    try(ResultSet result = dotaz.executeQuery())
                     {
-                        vysledky.next();
-                        String meno = vysledky.getString("MENO");
+                        result.next();
+                        String name = result.getString("NAME");
                         x=x+1;
                     }
                 }catch (SQLException ex) 
                 {
-                    System.out.println("Chyba při komunikaci s databází");
+                    System.out.println("Cannot communicate with database");
                 }
             }
             if((x == 2)&&(rola.equals(referent)))
             {
-                try (Connection spojenie = DriverManager.getConnection("jdbc:derby://localhost:1527/Server", "test", "test");
-                PreparedStatement dotaz = spojenie.prepareStatement("SELECT MENO,PRIEZVISKO FROM REFERENTI WHERE HESLO=?");)
+                try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
+                PreparedStatement dotaz = connect.prepareStatement("SELECT NAME,SURNAME FROM CLIENTS WHERE PASSWORD=?");)
                 {
                     dotaz.setString(1, s1);
-                    try(ResultSet vysledky = dotaz.executeQuery())
+                    try(ResultSet result = dotaz.executeQuery())
                     {
-                        vysledky.next();
-                        String meno = vysledky.getString("MENO");
-                        String priezvisko = vysledky.getString("PRIEZVISKO");
+                        result.next();
+                        String name = result.getString("NAME");
+                        String surname = result.getString("SURNAME");
                         x=x+1;
                     }
                 }catch (SQLException ex) 
                 {
-                    System.out.println("Chyba při komunikaci s databází");
+                    System.out.println("Cannot communicate with database");
                 }
             }
+            
+            if((x == 3)&&(rola.equals(student)))
+            {   
+             
+                 myWrapper.myQuery("SELECT * FROM TEST.R_KAMIL");
+                
+                
+            }
+            
+            
+            
             if(x == 0)
             {
-                s2="Pre studenta zadajte 's' pre referenta 'r'";
+                s2="Enter ID"; 
             }
             if(x == 1)
             {
-                s2="Zadaj Id";
+                s2="Enter ID";
             }
             if(x == 2)
             {
-                s2="Zadaj heslo";
+                s2="Enter Password";
             }
+            
             if(x == 3)
             {
-                s2="Boli ste uspesna zapisany";
+                s2="You have been successfully added";
                 x = 0;
                 
             }
+            
             dos.writeUTF(s2);
             dos.flush();
+            
         }
         dis.close();
         s.close();
