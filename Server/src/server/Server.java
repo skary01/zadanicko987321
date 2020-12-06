@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 /**
  * This class implements java Socket server
- * @author pankaj
+ * @author Ondirko, Karabinos
  *
  */
 
