@@ -1,85 +1,141 @@
 package server;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import java.sql.DriverManager;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
-
 import java.sql.SQLException;
-
+import java.sql.Statement;
 /**
  * This class implements java Socket server
- * @author Ondo
+ * @author pankaj
  *
  */
 
-public class Server {
-
-    //static ServerSocket variable
-    private static ServerSocket serverSocket;
-    //socket server port on which it will listen
-    private static int portKlient = 9876;
-    //private static int portDatabaza = 1527;
-    
-    public static void main(String args[]) throws IOException, SQLException, ClassNotFoundException, Exception{
-        
-       
-        
-        //create the socket server object
-        serverSocket = new ServerSocket(portKlient);
-//        server = new ServerSocket(portDatabaza);
-        //keep listens indefinitely until receives 'exit' call or program terminates
-        while(true){
-            int a=0;
-            System.out.println("Cakanie na poziadavky klienta");
-            //creating socket and waiting for client connection
-            Socket socket = serverSocket.accept();
-            //read from socket to ObjectInputStream object
-            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
-            //convert ObjectInputStream object to String
-            String message = (String) objectInputStream.readObject();
-            System.out.println("Poziadavka klienta: " + message);
-            
-             try (Connection spojenie = DriverManager.getConnection("jdbc:derby://localhost:1527/Server", "test", "test");
-                    PreparedStatement dotaz = spojenie.prepareStatement("SELECT MENO FROM REFERENTI WHERE CAST(ID AS VARCHAR (128))= 'massage'"); )
+public class Server 
+{
+    public static void main(String args[]) throws Exception, SQLException 
+    {
+        int x=0;
+        ServerSocket ss = new ServerSocket(3333);
+        Socket s = ss.accept();
+        DataInputStream dis = new DataInputStream(s.getInputStream());
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+        InputStreamReader isr = new InputStreamReader(System.in);
+        BufferedReader stdin = new BufferedReader(isr);
+        String s1="",s2="",rola="",student="s",referent="r";
+        while(!s1.equals("stop"))
+        {
+            s1=dis.readUTF();
+            if((x == 0)&&((s1.equals(student))||(s1.equals(referent))))
             {
-               
-               
-                try(ResultSet vypis = dotaz.executeQuery())
+                rola=s1;
+                x=x+1;
+            }  
+            System.out.println("Client: "+s1);
+            if((x == 1)&&(rola.equals(student)))
+            {
+                try (Connection spojenie = DriverManager.getConnection("jdbc:derby://localhost:1527/Server", "test", "test");
+                    PreparedStatement dotaz = spojenie.prepareStatement("SELECT MENO FROM STUDENTI WHERE ID=?");)
                 {
-                
-                    while (vypis.next()) 
-                    {   
-                        String id = vypis.getString("ID");;
-                        System.out.println("ID: " + id);
+                    dotaz.setString(1, s1);
+                    try(ResultSet vysledky = dotaz.executeQuery())
+                    {
+                        vysledky.next();
+                        String meno = vysledky.getString("MENO");
+                        x=x+1;
                     }
+                }catch (SQLException ex) 
+                {
+                    System.out.println("Chyba při komunikaci s databází");
                 }
             }
-            catch(Exception e){System.out.println(e);}
-            
-            
-            
-            //create ObjectOutputStream object
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-            //write object to Socket
-           
-                objectOutputStream.writeObject(" "+message);
-            
-            
-            //close resources
-            objectInputStream.close();
-            objectOutputStream.close();
-            socket.close();
-            //terminate the server if client sends exit request
-            if(message.equalsIgnoreCase("exit")) break;
+            if((x == 2)&&(rola.equals(student)))
+            {
+                try (Connection spojenie = DriverManager.getConnection("jdbc:derby://localhost:1527/Server", "test", "test");
+                PreparedStatement dotaz = spojenie.prepareStatement("SELECT MENO,PRIEZVISKO,ID FROM STUDENTI WHERE HESLO=?");)
+                {
+                    dotaz.setString(1, s1);
+                    try(ResultSet vysledky = dotaz.executeQuery())
+                    {
+                        vysledky.next();
+                        String meno = vysledky.getString("MENO");
+                        String priezvisko = vysledky.getString("PRIEZVISKO");
+                        String id = vysledky.getString("ID");
+                        
+
+                        x=x+1;
+                    }
+                }catch (SQLException ex) 
+                {
+                    System.out.println("Chyba při komunikaci s databází");
+                }
+            }
+            if((x == 1)&&(rola.equals(referent)))
+            {
+                try (Connection spojenie = DriverManager.getConnection("jdbc:derby://localhost:1527/Server", "test", "test");
+                    PreparedStatement dotaz = spojenie.prepareStatement("SELECT MENO FROM REFERENTI WHERE ID=?");)
+                {
+                    dotaz.setString(1, s1);
+                    try(ResultSet vysledky = dotaz.executeQuery())
+                    {
+                        vysledky.next();
+                        String meno = vysledky.getString("MENO");
+                        x=x+1;
+                    }
+                }catch (SQLException ex) 
+                {
+                    System.out.println("Chyba při komunikaci s databází");
+                }
+            }
+            if((x == 2)&&(rola.equals(referent)))
+            {
+                try (Connection spojenie = DriverManager.getConnection("jdbc:derby://localhost:1527/Server", "test", "test");
+                PreparedStatement dotaz = spojenie.prepareStatement("SELECT MENO,PRIEZVISKO FROM REFERENTI WHERE HESLO=?");)
+                {
+                    dotaz.setString(1, s1);
+                    try(ResultSet vysledky = dotaz.executeQuery())
+                    {
+                        vysledky.next();
+                        String meno = vysledky.getString("MENO");
+                        String priezvisko = vysledky.getString("PRIEZVISKO");
+                        x=x+1;
+                    }
+                }catch (SQLException ex) 
+                {
+                    System.out.println("Chyba při komunikaci s databází");
+                }
+            }
+            if(x == 0)
+            {
+                s2="Pre studenta zadajte 's' pre referenta 'r'";
+            }
+            if(x == 1)
+            {
+                s2="Zadaj Id";
+            }
+            if(x == 2)
+            {
+                s2="Zadaj heslo";
+            }
+            if(x == 3)
+            {
+                s2="Boli ste uspesna zapisany";
+                x = 0;
+                
+            }
+            dos.writeUTF(s2);
+            dos.flush();
         }
-        System.out.println("Vpnutie servera");
-        //close the ServerSocket object
-        serverSocket.close();
+        dis.close();
+        s.close();
+        ss.close();
     }
 }
