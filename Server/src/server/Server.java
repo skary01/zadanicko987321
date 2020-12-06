@@ -22,7 +22,7 @@ import java.sql.Timestamp;
  */
 
 public class Server 
-{
+{   
     public static void main(String args[]) throws Exception, SQLException 
     {    Server myWrapper = new Server() ;
 
@@ -33,7 +33,7 @@ public class Server
         DataOutputStream dos = new DataOutputStream(s.getOutputStream());
         InputStreamReader isr = new InputStreamReader(System.in);
         BufferedReader stdin = new BufferedReader(isr);
-        String s1="",s2="",rola="",student="student",referent="referent", pomocna="",neries="maria";
+        String s1="",s2="",rola="",student="student",referent="referent", pomocna="",neries="maria",kktiny="robert";
         while(!s1.equals("stop"))
         {
             s1=dis.readUTF();
@@ -88,9 +88,9 @@ public class Server
                 }catch (SQLException ex) 
                 {
                     System.out.println("Cannot communicate with database");
-                    }
+                }
             }
-            if(((x == 3)&&(rola.equals(student))))
+            if(((x == 3)&&(s1.equals(neries))))
             {
                 try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
                 PreparedStatement dotaz = connect.prepareStatement("SELECT NAME,SURNAME,ID FROM CLIENTS WHERE ID=?");)
@@ -111,47 +111,94 @@ public class Server
                 }catch (SQLException ex) 
                 {
                     System.out.println("Cannot communicate with database");
-                    }
+                }
             }
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            if((x == 1)&&(rola.equals(referent)))
+            if(((x == 3)&&(s1.equals(kktiny))))
             {
                 try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
-                    PreparedStatement dotaz = connect.prepareStatement("SELECT NAME FROM CLIENTS WHERE ID=?");)
+                PreparedStatement dotaz = connect.prepareStatement("SELECT NAME,SURNAME,ID FROM CLIENTS WHERE ID=?");)
                 {
-                    dotaz.setString(1, s1);
+                    dotaz.setString(1, pomocna);
                     try(ResultSet result = dotaz.executeQuery())
                     {
                         result.next();
                         String name = result.getString("NAME");
-                        x=x+1;
+                        String surname = result.getString("SURNAME");
+                        String id = result.getString("ID");
+                        Statement stmt = connect.createStatement();
+                        stmt.executeUpdate("insert into TEST.ROBERT(name,surname,id) values('"+name+"','"+surname+"','"+id+"')");
+                        System.out.println("Data is inserted ");
+                        x=0;                    
                     }
                 }catch (SQLException ex) 
                 {
                     System.out.println("Cannot communicate with database");
                 }
             }
+            
+            
+            
+            
+            
+            
+            
+            
             if((x == 2)&&(rola.equals(referent)))
             {
                 try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
-                PreparedStatement dotaz = connect.prepareStatement("SELECT NAME,SURNAME FROM CLIENTS WHERE PASSWORD=?");)
+                    PreparedStatement dotaz = connect.prepareStatement("SELECT NAME FROM CLIENTS WHERE PASSWORD=?");)
                 {
                     dotaz.setString(1, s1);
                     try(ResultSet result = dotaz.executeQuery())
                     {
                         result.next();
                         String name = result.getString("NAME");
+                        x=3;
+                    }
+                }catch (SQLException ex) 
+                {
+                    System.out.println("Cannot communicate with database");
+                }
+            }
+            if(((x == 3)&&(s1.equals(neries))))
+            {
+                try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
+                PreparedStatement dotaz = connect.prepareStatement("SELECT NAME,SURNAME,ID FROM CLIENTS WHERE ID=?");)
+                {
+                    dotaz.setString(1, pomocna);
+                    try(ResultSet result = dotaz.executeQuery())
+                    {
+                        result.next();
+                        String name = result.getString("NAME");
                         String surname = result.getString("SURNAME");
-                        x=x+1;
+                        String id = result.getString("ID");
+                        Statement stmt = connect.createStatement();
+                        stmt.executeUpdate("insert into TEST.MARIA(name,surname,id) values('"+name+"','"+surname+"','"+id+"')");
+                        System.out.println("Data is inserted ");
+                        x=0;
                         
+                    }
+                }catch (SQLException ex) 
+                {
+                    System.out.println("Cannot communicate with database");
+                }
+            }
+            if(((x == 3)&&(s1.equals(kktiny))))
+            {
+                try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
+                PreparedStatement dotaz = connect.prepareStatement("SELECT NAME,SURNAME,ID FROM CLIENTS WHERE ID=?");)
+                {
+                    dotaz.setString(1, pomocna);
+                    try(ResultSet result = dotaz.executeQuery())
+                    {
+                        result.next();
+                        String name = result.getString("NAME");
+                        String surname = result.getString("SURNAME");
+                        String id = result.getString("ID");
+                        Statement stmt = connect.createStatement();
+                        stmt.executeUpdate("insert into TEST.ROBERT(name,surname,id) values('"+name+"','"+surname+"','"+id+"')");
+                        System.out.println("Data is inserted ");
+                        x=0;                    
                     }
                 }catch (SQLException ex) 
                 {
@@ -169,7 +216,7 @@ public class Server
             }     
             if(x == 3)
             {
-                s2="Maria alebo Robert?";
+                s2="maria or robert";
                 
             }
   
