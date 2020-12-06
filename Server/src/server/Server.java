@@ -11,8 +11,10 @@ import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 /**
  * 
  * @author Ondirko, Karabinos
@@ -28,20 +30,45 @@ public class Server
         
   }
     
+    private void printResultSet(ResultSet pResultSet) throws SQLException {
+    ResultSetMetaData rsmd = pResultSet.getMetaData();
+    int columnsNumber = rsmd.getColumnCount();
+    while (pResultSet.next()) {
+        for (int i = 1; i <= columnsNumber; i++) {
+            if (i > 1) System.out.print(",  ");
+            String columnValue = pResultSet.getString(i);
+            System.out.print(rsmd.getColumnName(i) + ": " + columnValue);
+        }
+        System.out.println("");
+    }
+  }
     
     private void logSimpleQuery(String pCommand) throws SQLException {
-        
         Statement myStatement = mConnection.createStatement();
-        myStatement.executeUpdate ("INSERT INTO TEST.R_KAMIL ( MENO,PRIEZVISKO,PORADIE,ID ) VALUES ('MICHAL','DOCOLO',1,'4512') ");
-        
-        
+      
+        Timestamp myTs = new Timestamp(System.currentTimeMillis());
+        myStatement.executeUpdate("INSERT INTO TEST.MARIA (NAME, SURNAME) VALUES ('"+myTs+"','called: myQuery')");
     }
     
+     private void logFullQuery(String pCommand) throws SQLException {
+         
+        Statement myStatement = mConnection.createStatement();
+        String mySqlString = "INSERT INTO TEST.MARIA ( NAME, SURNAME,ID) VALUES ( ?, ?,?)" ;
+        PreparedStatement ps = mConnection.prepareStatement( mySqlString );
+        ps.setObject( 1,pCommand);
+        ps.setString( 2, pCommand ) ;
+        ps.setString( 3, pCommand) ;
+        ps.executeUpdate();
+    }
+    
+     
+     
   public void myQuery(String pCommand) throws SQLException {
         Statement myStatement = mConnection.createStatement();
         ResultSet myResultSet = myStatement.executeQuery(pCommand);
-       logSimpleQuery(pCommand);
-       
+        logSimpleQuery(pCommand);
+       logFullQuery(pCommand);
+       printResultSet (myResultSet);
     }  
     
     
@@ -114,8 +141,14 @@ public class Server
                         String surname = result.getString("SURNAME");
                         String id = result.getString("ID");
                         
-
                         x=x+1;
+                        if((x == 3)&&(rola.equals(student)))
+            {   
+              myWrapper.myQuery("SELECT * FROM MARIA");
+                
+                
+                
+            }
                     }
                 }catch (SQLException ex) 
                 {
@@ -151,6 +184,7 @@ public class Server
                         String name = result.getString("NAME");
                         String surname = result.getString("SURNAME");
                         x=x+1;
+                        
                     }
                 }catch (SQLException ex) 
                 {
@@ -158,13 +192,7 @@ public class Server
                 }
             }
             
-            if((x == 3)&&(rola.equals(student)))
-            {   
-             
-                 myWrapper.myQuery("SELECT * FROM TEST.R_KAMIL");
-                
-                
-            }
+            
             
             
             
