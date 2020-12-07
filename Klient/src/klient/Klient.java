@@ -16,22 +16,23 @@ public class Klient {
 
     public static void main(String[] args) throws Exception
     { 
-        Socket s = new Socket("localhost",3333);
-        DataInputStream dis = new DataInputStream(s.getInputStream());
-        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
-        InputStreamReader isr = new InputStreamReader(System.in);
-        BufferedReader stdin = new BufferedReader(isr);
-        String s1="",s2="";
-        System.out.println("'s' pre studenta 'r' pre refeerenta");  
-        while(!s1.equals("stop"))
+        Socket socket = new Socket("localhost",3333);
+        DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+        InputStreamReader inputStreamReader = new InputStreamReader(System.in);
+        BufferedReader buffer = new BufferedReader(inputStreamReader);
+        
+        String socket1="",socket2="";
+        System.out.println("Enter ID");  
+        while(!socket1.equals("stop"))
         {         
-            s2=stdin.readLine();
-            dos.writeUTF(s2);
-            dos.flush();
-            s1=dis.readUTF();
-            System.out.println("Server: "+s1);
+            socket2=buffer.readLine();
+            dataOutputStream.writeUTF(socket2);
+            dataOutputStream.flush();
+            socket1=dataInputStream.readUTF();
+            System.out.println("Server: "+socket1);
         }
-        dos.close();
-        s.close();
+        dataOutputStream.close();
+        socket.close();
     }
 }
