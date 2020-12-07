@@ -11,10 +11,8 @@ import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 /**
  * 
  * @author Ondirko, Karabinos
@@ -24,30 +22,31 @@ import java.sql.Timestamp;
 public class Server 
 {   
     public static void main(String args[]) throws Exception, SQLException 
-    {    Server myWrapper = new Server() ;
+    {    
+        Server myWrapper = new Server() ;
 
         int x=0;
-        ServerSocket ss = new ServerSocket(3333);
-        Socket s = ss.accept();
-        DataInputStream dis = new DataInputStream(s.getInputStream());
-        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
-        InputStreamReader isr = new InputStreamReader(System.in);
-        BufferedReader stdin = new BufferedReader(isr);
-        String s1="",s2="",rola="",student="student",referent="referent", pomocna="",maria="Maria",robert="robert",vypis="vypis";
-        while(!s1.equals("stop"))
+        ServerSocket serverSocket = new ServerSocket(3333);
+        Socket socket = serverSocket.accept();
+        DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+        InputStreamReader inputStreamReader = new InputStreamReader(System.in);
+        BufferedReader stdin = new BufferedReader(inputStreamReader);
+        String socket1="",socket2="",rola="",student="student",referent="referent", pomocna="",maria="741963",robert="robert",vypis="vypis";
+        while(!socket1.equals("stop"))
         {
-            s1=dis.readUTF();
+            socket1=dataInputStream.readUTF();
             if(x == 0)
             {
                 try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
-                    PreparedStatement dotaz = connect.prepareStatement("SELECT TYPE_OF_CLIENT FROM CLIENTS WHERE ID=?");)
+                    PreparedStatement preparedStatement = connect.prepareStatement("SELECT TYPE_OF_CLIENT FROM CLIENTS WHERE ID=?");)
                 {
-                    dotaz.setString(1, s1);
-                    try(ResultSet result = dotaz.executeQuery())
+                    preparedStatement.setString(1, socket1);
+                    try(ResultSet result = preparedStatement.executeQuery())
                     {
                         result.next();
                         rola = result.getString("TYPE_OF_CLIENT");
-                        pomocna = s1;
+                        pomocna = socket1;
                         x=1;
                     }
                 }catch (SQLException ex) 
@@ -60,14 +59,14 @@ public class Server
             
             
             
-            System.out.println("Client: "+s1);
+            System.out.println("Client: "+socket1);
             if((x == 1)&&(rola.equals(student)))
             {
                 try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
-                    PreparedStatement dotaz = connect.prepareStatement("SELECT NAME FROM CLIENTS WHERE ID=?");)
+                    PreparedStatement preparedStatement = connect.prepareStatement("SELECT NAME FROM CLIENTS WHERE ID=?");)
                 {
-                    dotaz.setString(1, s1);
-                    try(ResultSet result = dotaz.executeQuery())
+                    preparedStatement.setString(1, socket1);
+                    try(ResultSet result = preparedStatement.executeQuery())
                     {
                         result.next();
                         String name = result.getString("NAME");
@@ -81,10 +80,10 @@ public class Server
             if((x == 2)&&(rola.equals(student)))
             {
                 try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
-                PreparedStatement dotaz = connect.prepareStatement("SELECT NAME FROM CLIENTS WHERE PASSWORD=?");)
+                PreparedStatement preparedStatement = connect.prepareStatement("SELECT NAME FROM CLIENTS WHERE PASSWORD=?");)
                 {
-                    dotaz.setString(1, s1);
-                    try(ResultSet result = dotaz.executeQuery())
+                    preparedStatement.setString(1, socket1);
+                    try(ResultSet result = preparedStatement.executeQuery())
                     {
                         result.next();
                         String name = result.getString("NAME");
@@ -95,20 +94,20 @@ public class Server
                     System.out.println("Cannot communicate with database");
                 }
             }
-            if(((x == 3)&&(s1.equals(maria))))
+            if(((x == 3)&&(socket1.equals(maria))))
             {
                 try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
-                PreparedStatement dotaz = connect.prepareStatement("SELECT NAME,SURNAME,ID FROM CLIENTS WHERE ID=?");)
+                PreparedStatement preparedStatement = connect.prepareStatement("SELECT NAME,SURNAME,ID FROM CLIENTS WHERE ID=?");)
                 {
-                    dotaz.setString(1, pomocna);
-                    try(ResultSet result = dotaz.executeQuery())
+                    preparedStatement.setString(1, pomocna);
+                    try(ResultSet result = preparedStatement.executeQuery())
                     {
                         result.next();
                         String name = result.getString("NAME");
                         String surname = result.getString("SURNAME");
                         String id = result.getString("ID");
-                        Statement stmt = connect.createStatement();
-                        stmt.executeUpdate("insert into TEST.MARIA(name,surname,id) values('"+name+"','"+surname+"','"+id+"')");
+                        Statement statement = connect.createStatement();
+                        statement.executeUpdate("insert into TEST.MARIA(name,surname,id) values('"+name+"','"+surname+"','"+id+"')");
                         System.out.println("Data is inserted ");
                         x=0;
                         
@@ -118,20 +117,20 @@ public class Server
                     System.out.println("Cannot communicate with database");
                 }
             }
-            if(((x == 3)&&(s1.equals(robert))))
+            if(((x == 3)&&(socket1.equals(robert))))
             {
                 try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
-                PreparedStatement dotaz = connect.prepareStatement("SELECT NAME,SURNAME,ID FROM CLIENTS WHERE ID=?");)
+                PreparedStatement preparedStatement = connect.prepareStatement("SELECT NAME,SURNAME,ID FROM CLIENTS WHERE ID=?");)
                 {
-                    dotaz.setString(1, pomocna);
-                    try(ResultSet result = dotaz.executeQuery())
+                    preparedStatement.setString(1, pomocna);
+                    try(ResultSet result = preparedStatement.executeQuery())
                     {
                         result.next();
                         String name = result.getString("NAME");
                         String surname = result.getString("SURNAME");
                         String id = result.getString("ID");
-                        Statement stmt = connect.createStatement();
-                        stmt.executeUpdate("insert into TEST.ROBERT(name,surname,id) values('"+name+"','"+surname+"','"+id+"')");
+                        Statement statement = connect.createStatement();
+                        statement.executeUpdate("insert into TEST.ROBERT(name,surname,id) values('"+name+"','"+surname+"','"+id+"')");
                         System.out.println("Data is inserted ");
                         x=0;                    
                     }
@@ -146,14 +145,14 @@ public class Server
             if((x == 1)&&(rola.equals(referent)))
             {
                 try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
-                    PreparedStatement dotaz = connect.prepareStatement("SELECT NAME FROM CLIENTS WHERE ID=?");)
+                    PreparedStatement preparedStatement = connect.prepareStatement("SELECT NAME FROM CLIENTS WHERE ID=?");)
                 {
-                    dotaz.setString(1, s1);
-                    try(ResultSet result = dotaz.executeQuery())
+                    preparedStatement.setString(1, socket1);
+                    try(ResultSet result = preparedStatement.executeQuery())
                     {
                         result.next();
                         String name = result.getString("NAME");
-                        pomocna=name;
+                        pomocna = socket1;
                         x=2;
                     }
                 }catch (SQLException ex) 
@@ -164,13 +163,13 @@ public class Server
             if((x == 2)&&(rola.equals(referent)))
             {
                 try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
-                    PreparedStatement dotaz = connect.prepareStatement("SELECT NAME FROM CLIENTS WHERE PASSWORD=?");)
+                    PreparedStatement preparedStatement = connect.prepareStatement("SELECT NAME FROM CLIENTS WHERE PASSWORD=?");)
                 {
-                    dotaz.setString(1, s1);
-                    try(ResultSet result = dotaz.executeQuery())
+                    preparedStatement.setString(1, socket1);
+                    try(ResultSet result = preparedStatement.executeQuery())
                     {
                         result.next();
-                        String name = result.getString("NAME");
+                        String name = result.getString("NAME");   
                         x=3;
                     }
                 }catch (SQLException ex) 
@@ -178,46 +177,53 @@ public class Server
                     System.out.println("Cannot communicate with database");
                 }
             }
-            if(((x == 3)&&(pomocna.equals(maria)))&&(s1.equals(vypis)))
+            if((x == 3)&&(rola.equals(referent))&&(socket1.equals(vypis))&&(pomocna.equals(maria)))
             {
-                System.out.println("Meno: " + pomocna);
-                Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
-                Statement stmt = connect.createStatement();            
-                ResultSet resoultset = stmt.executeQuery("select * from TEST.MARIA");
-                resoultset.beforeFirst();
-                while (resoultset.next()) 
+                try
                 {
-                    String nazov = resoultset.getString("MENO");
-                    System.out.println("Nazov: " + nazov);
+                    Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
+                    Statement statement = connect.createStatement();            
+                    ResultSet resoultset = statement.executeQuery("select * from TEST.MARIA");
+                    while (resoultset.next()) 
+                    {
+                        String name = resoultset.getString("NAME");
+                        System.out.println("NAME: " + name);
+                    }  
                     x=0;
-                }                   
+                }catch (SQLException ex) 
+                {
+                    System.out.println("Cannot communicate with database");
+                }
             }
-            
+
+                
+
             if(x == 0)
             {
-                s2="Enter ID"; 
+                socket2="Enter ID"; 
             }
             if(x == 2)
             {
-                s2="Enter password";
+                socket2="Enter password";
             }     
             if((x == 3)&&(rola.equals(student)))
             {
-                s2="maria or robert";
+                socket2="maria or robert";
             }
             if((x == 3)&&(rola.equals(referent)))
             {
-                s2="vypis alebo poradie";
+                socket2="vypis alebo poradie";
                 
             }
+            
   
             
-            dos.writeUTF(s2);
-            dos.flush();
+            dataOutputStream.writeUTF(socket2);
+            dataOutputStream.flush();
             
         }
-        dis.close();
-        s.close();
-        ss.close();
+        dataInputStream.close();
+        socket.close();
+        serverSocket.close();
     }
 }
