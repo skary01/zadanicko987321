@@ -34,6 +34,7 @@ public class Server
         BufferedReader buffer = new BufferedReader(inputStreamReader);
         
         String socket1="",socket2="",socket3="",rola="",student="student",referent="referent",maria="maria",robert="robert",vypis="vypis",helpID="",helpName="";
+        
         while(!socket1.equals("stop"))
         {
             socket1=dataInputStream.readUTF();
@@ -89,7 +90,7 @@ public class Server
                         result.next();
                         String name = result.getString("NAME");
                         
-                        x=69;
+                        x=60;
                         socket2="Ak chcete sa zapisat zadajte 1, Ak chcete vypisat kde vase schodzky zadajte 2";
                         dataOutputStream.writeUTF(socket2);
                         dataOutputStream.flush();
@@ -124,7 +125,7 @@ public class Server
                 {
                     System.out.println("Cannot communicate with database");
                 }
-            }
+                }
             }
             if(x == 7)
             {
@@ -204,25 +205,25 @@ public class Server
                     {
                         result.next();
                         String name = result.getString("NAME");   
-                        x=69;
-                        socket2="Ak chcete sa vypisat prihlasenych studentov zadajte 1, Ak chcete posunut 2";
                         
+                        x=60;
+                        socket2="Ak chcete sa vypisat prihlasenych studentov zadajte 10, Ak chcete zavolat najblizsieho studenta 20";
                         dataOutputStream.writeUTF(socket2);
                         dataOutputStream.flush();
-                        
                         socket1=dataInputStream.readUTF();
-                        if(socket1.equals("1"))
+                        
+                        if(socket1.equals("10"))
                                 {   x=10;
                         
                                    }
-                        if(socket1.equals("2"))
+                        if(socket1.equals("20"))
                                 {   x=20;
                         
                                    }
-                    }
-                }catch (SQLException ex) 
-                {
+                    }catch (SQLException ex) 
+                    {
                     System.out.println("Cannot communicate with database");
+                    }
                 }
             }
             if((x == 10)&&(rola.equals(referent)))
@@ -282,7 +283,7 @@ public class Server
                 }
             }
             
-            if((x == 21)&&(rola.equals(referent)))
+            if((x == 20)&&(rola.equals(referent)))
             {
                 try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/ServerDatabase", "test", "test");
                     PreparedStatement preparedStatement = connect.prepareStatement("ERASE NAME,SURNAME,ID FROM '"+helpName+"' ");)
@@ -320,11 +321,11 @@ public class Server
             {
                 socket2="Enter password";
             }     
-            if(x == 69)
+            if(x == 60)
             {
                 
                 socket2="Nechcel vypisat";
-                
+                x=0;
             }
             if(x == 5)
             {
