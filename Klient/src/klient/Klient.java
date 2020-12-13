@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 /**
- * This class implements java socket client
+ * 
  * @author Ondirko, Karabinos
  *
  */
